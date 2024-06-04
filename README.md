@@ -48,10 +48,11 @@ pip install pandas numpy seaborn matplotlib tensorflow scikit-learn nltk Sastraw
 
 ```
 .
-├── Sentiment_Analisis.ipynb
-├── clean_data_baru.csv
-├── sentiment_analysis_model.h5
-├── sentiment_analysis_model.tflite
+├── code
+│   ├── Sentiment_Analisis.ipynb
+│   ├── clean_data_baru.csv
+│   ├── sentiment_analysis_model.h5
+│   └── sentiment_analysis_model.tflite
 ├── Dataset
 │   ├── dataset_komentar_instagram_cyberbullying.csv
 │   └── key_norm.csv
