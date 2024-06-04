@@ -1,7 +1,7 @@
 # Machine-Learning
 Repository for Machine Learning
 
-# Sentiment Analysis
+# 1.Sentiment Analysis
 
 This project is a sentiment analysis pipeline for analyzing comments from Instagram to detect cyberbullying. The project involves data preprocessing, feature extraction, feature selection, model building, evaluation, and saving the model for future use.
 
