@@ -295,7 +295,8 @@ This README provides an overview of the sentiment analysis project and explains 
 
 # 2. Artwork Genre Classification
 
-Artwork Genre Classification
+```markdown
+# Artwork Genre Classification
 
 This repository contains code for classifying artwork images into different genres using TensorFlow. The project involves detailed steps for data pipelining, data splitting, model building, training, evaluation, model saving, and prediction.
 
@@ -303,20 +304,40 @@ This repository contains code for classifying artwork images into different genr
 
 The data pipelining process involves downloading and preprocessing artwork images.
 
-- **Downloading Dataset**: The dataset is downloaded from GitHub using the `git clone` command.
-- **Setting Dataset Path**: The path to the dataset folder is set.
-- **Creating Preprocessed Directory**: A new directory is created to store preprocessed images.
-- **Image Preprocessing**: Images are resized and converted to PNG format using the `preprocess_and_save_image` function.
+### Downloading Dataset
 
-python
-# Downloading dataset and setting dataset path
+The dataset is downloaded from GitHub using the `git clone` command.
+
+```python
+# Downloading dataset
+# !git clone https://github.com/zidan2808/NEW-ART-DATASETS.git
+```
+
+### Setting Dataset Path
+
+The path to the dataset folder is set.
+
+```python
+# Setting dataset path
 dataset_dir = 'NEW ART DATASETS/ARTSCAPE'
+```
 
+### Creating Preprocessed Directory
+
+A new directory is created to store preprocessed images.
+
+```python
 # Creating preprocessed directory
 preprocessed_dir = 'preprocessed_art'
 if not os.path.exists(preprocessed_dir):
     os.makedirs(preprocessed_dir)
+```
 
+### Image Preprocessing
+
+Images are resized and converted to PNG format using the `preprocess_and_save_image` function.
+
+```python
 # Image preprocessing
 for root, dirs, files in os.walk(dataset_dir):
     for file in files:
@@ -326,7 +347,51 @@ for root, dirs, files in os.walk(dataset_dir):
             save_path = os.path.join(preprocessed_dir, os.path.splitext(relative_path)[0] + '.png')
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             preprocess_and_save_image(image_path, save_path)
+```
 
+## Data Splitting
+
+The dataset is split into training and validation sets.
+
+```python
+# Splitting data into training and validation sets
+train_dir = os.path.join(base_dir, 'train')
+os.makedirs(train_dir, exist_ok=True)
+validation_dir = os.path.join(base_dir, 'validation')
+os.makedirs(validation_dir, exist_ok=True)
+
+# Splitting path gambar menjadi bagian training dan validasi
+for class_name in class_names:
+    # Path ke direktori kelas di dataset asli
+    class_original_dir = os.path.join(original_dataset_dir, class_name)
+
+    # Path ke direktori kelas di dataset baru untuk training dan validasi
+    class_train_dir = os.path.join(train_dir, class_name)
+    os.makedirs(class_train_dir, exist_ok=True)
+    class_validation_dir = os.path.join(validation_dir, class_name)
+    os.makedirs(class_validation_dir, exist_ok=True)
+
+    # Splitting path gambar menjadi bagian training dan validasi
+    image_paths = [os.path.join(class_original_dir, image_name)
+                   for image_name in os.listdir(class_original_dir)]
+    train_image_paths, validation_image_paths = train_test_split(
+        image_paths, test_size=0.2, random_state=42)
+
+    # Menyalin gambar ke direktori training
+    for image_path in train_image_paths:
+        image_name = os.path.basename(image_path)
+        target_path = os.path.join(class_train_dir, image_name)
+        copyfile(image_path, target_path)
+
+    # Menyalin gambar ke direktori validation
+    for image_path in validation_image_paths:
+        image_name = os.path.basename(image_path)
+        target_path = os.path.join(class_validation_dir, image_name)
+        copyfile(image_path, target_path)
+
+print("Pemisahan dataset selesai.")
+```
+```
 
 ## Data Splitting
 
