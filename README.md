@@ -551,5 +551,3 @@ Trained model is loaded from the saved .h5 file.
 ```python
 # Loading the saved model
 loaded_model = load_model('genre_classification_84.h5')
-```
-```
