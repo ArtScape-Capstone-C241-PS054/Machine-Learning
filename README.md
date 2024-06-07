@@ -294,7 +294,7 @@ print(f'Hasil Prediksi: {preprocess_and_predict(input_text)}')
 This README provides an overview of the sentiment analysis project and explains how to use the provided code to perform sentiment analysis on Instagram comments.
 
 # 2. Artwork Genre Classification
-```markdown
+
 Artwork Genre Classification
 
 This repository contains code for classifying artwork images into different genres using TensorFlow. The project involves detailed steps for data pipelining, data splitting, model building, training, evaluation, model saving, and prediction.
@@ -308,7 +308,7 @@ The data pipelining process involves downloading and preprocessing artwork image
 - **Creating Preprocessed Directory**: A new directory is created to store preprocessed images.
 - **Image Preprocessing**: Images are resized and converted to PNG format using the `preprocess_and_save_image` function.
 
-```python
+python
 # Downloading dataset and setting dataset path
 dataset_dir = 'NEW ART DATASETS/ARTSCAPE'
 
@@ -326,7 +326,7 @@ for root, dirs, files in os.walk(dataset_dir):
             save_path = os.path.join(preprocessed_dir, os.path.splitext(relative_path)[0] + '.png')
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             preprocess_and_save_image(image_path, save_path)
-```
+
 
 ## Data Splitting
 
