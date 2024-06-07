@@ -293,8 +293,9 @@ print(f'Hasil Prediksi: {preprocess_and_predict(input_text)}')
 
 This README provides an overview of the sentiment analysis project and explains how to use the provided code to perform sentiment analysis on Instagram comments.
 
-```markdown
 # 2. Artwork Genre Classification
+```markdown
+Artwork Genre Classification
 
 This repository contains code for classifying artwork images into different genres using TensorFlow. The project involves detailed steps for data pipelining, data splitting, model building, training, evaluation, model saving, and prediction.
 
