@@ -296,7 +296,7 @@ This README provides an overview of the sentiment analysis project and explains 
 # 2. Artwork Genre Classification
 
 ```markdown
-# Artwork Genre Classification
+Artwork Genre Classification
 
 This repository contains code for classifying artwork images into different genres using TensorFlow. The project involves detailed steps for data pipelining, data splitting, model building, training, evaluation, model saving, and prediction.
 
@@ -307,11 +307,11 @@ The data pipelining process involves downloading and preprocessing artwork image
 ### Downloading Dataset
 
 The dataset is downloaded from GitHub using the `git clone` command.
-
-```python
-# Downloading dataset
-# !git clone https://github.com/zidan2808/NEW-ART-DATASETS.git
 ```
+
+# Downloading dataset
+git clone https://github.com/zidan2808/NEW-ART-DATASETS.git
+
 
 ### Setting Dataset Path
 
