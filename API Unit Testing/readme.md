@@ -66,47 +66,143 @@ except Exception as e:
 ```
 Ini memuat model analisis sentimen dan objek-objek yang diperlukan seperti vektorisasi TF-IDF dan fitur-fitur chi-squared yang telah disimpan sebelumnya.
 
-### 7. Fungsi Pra-Pemrosesan Teks untuk Analisis Sentimen
+### 1. Fungsi Pra-Pemrosesan Teks untuk Analisis Sentimen
 ```python
+# Definisikan fungsi pra-pemrosesan teks untuk analisis sentimen
 def preprocess_text(text):
-    # Implementasi pra-pemrosesan teks
-    ...
-```
-Ini adalah serangkaian fungsi-fungsi yang digunakan untuk pra-pemrosesan teks sebelum meneruskannya ke model analisis sentimen.
+    text = text.lower()
+    text = re.sub(r'@[A-Za-z0-9_]+', '', text) 
+    text = re.sub(r'#\w+', '', text) 
+    text = re.sub(r'https?://\S+', '', text)  
+    text = re.sub(r'<[^>]+>', '', text)  
+    text = re.sub(r'[^A-Za-z\s]', '', text)  
+    return text
 
-### 8. Definisi Fungsi Prediksi untuk Analisis Sentimen
+def normalize_text(text):
+    words = text.split()
+    normalized_words = []
+    for word in words:
+        match = key_norm[key_norm['singkat'] == word]
+        normalized_words.append(match['hasil'].values[0] if not match.empty else word)
+    return ' '.join(normalized_words).lower()
+
+stopwords_ind = stopwords.words('indonesian')
+more_stopwords = ['tsel', 'gb', 'rb']  
+stopwords_ind.extend(more_stopwords)
+
+def remove_stopwords(text):
+    return " ".join([word for word in text.split() if word not in stopwords_ind])
+
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
+
+def stem_text(text):
+    return stemmer.stem(text)
+
+def preprocess_text_pipeline(text):
+    text = preprocess_text(text)
+    text = normalize_text(text)
+    text = remove_stopwords(text)
+    text = stem_text(text)
+    return text
+```
+
+### 2. Definisi Fungsi Prediksi untuk Analisis Sentimen
 ```python
+# Definisikan fungsi prediksi untuk analisis sentimen
 def predict_sentiment(input_text):
-    # Implementasi prediksi analisis sentimen
-    ...
+    try:
+        preprocessed_text = preprocess_text_pipeline(input_text)
+        tf_idf_vec = tf_idf.transform([preprocessed_text]).toarray()
+        kbest_vec = chi2_features.transform(tf_idf_vec)
+        prediction = (sentiment_model.predict(kbest_vec) > 0.5).astype("int32")
+        return 'positive' if prediction == 1 else 'negative'
+    except Exception as e:
+        logging.error(f"Error in sentiment analysis preprocessing or prediction: {e}")
+        return 'error'
 ```
-Ini adalah fungsi yang digunakan untuk memprediksi sentimen dari teks yang diberikan.
 
-### 9. Fungsi Pra-Pemrosesan Gambar
+### 3. Fungsi Pra-Pemrosesan Gambar
 ```python
+# Fungsi untuk pra-pemrosesan gambar
 def preprocess_image(image_path):
-    # Implementasi pra-pemrosesan gambar
-    ...
+    img = load_img(image_path, target_size=(IMG_HEIGHT, IMG_WIDTH))
+    x = img_to_array(img)
+    x /= 255.0
+    x = np.expand_dims(x, axis=0)
+    return x
 ```
-Ini adalah fungsi yang digunakan untuk pra-pemrosesan gambar sebelum meneruskannya ke model klasifikasi gambar.
 
-### 10. Rute untuk Halaman Utama
+### 4. Rute untuk Halaman Utama
 ```python
+# Rute untuk halaman utama dengan formulir unggah
 @app.route('/')
 def home():
-    # Implementasi halaman utama
-    ...
+    return '''
+    <h1>Upload an image for genre prediction and enter a text for sentiment analysis</h1>
+    <form method="POST" action="/predict" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="text" name="text" placeholder="Enter text for sentiment analysis">
+        <input type="submit" value="Upload and Predict">
+    </form>
+    '''
 ```
-Ini adalah rute yang digunakan untuk menampilkan halaman utama aplikasi web, yang berisi formulir untuk mengunggah gambar dan teks.
 
-### 11. Rute untuk Prediksi
+### 5. Rute untuk Prediksi
 ```python
+# Rute untuk menangani prediksi untuk gambar dan teks
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Implementasi rute untuk menangani prediksi gambar dan teks
-    ...
-```
-Ini adalah rute yang menangani permintaan prediksi, baik untuk gambar maupun teks.
+    try:
+        if 'file' not in request.files:
+            return '<p>No file in request.</p>', 400
+        
+        file = request.files['file']
+        text = request.form['text']
+
+        # Prediksi gambar
+        if file.filename != '':
+            with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                file_path = tmp_file.name
+                file.save(file_path)
+
+            try:
+                # Pra-pemrosesan gambar
+                image_tensor = preprocess_image(file_path)
+
+                # Prediksi probabilitas kelas
+                classes = image_model.predict(image_tensor)
+                top_3_indices = np.argsort(classes[0])[-3:][::-1]
+
+                 # Siapkan hasil prediksi gambar
+                image_predictions = []
+                for i in top_3_indices:
+                    class_name = class_indices[i]
+                    probability = classes[0][i]
+                    image_predictions.append({'class': class_name, 'probability': float(probability)})
+
+                image_result_html = '<h1>Image Prediction Result</h1>'
+                for pred in image_predictions:
+                    image_result_html += f"<p>Class: {pred['class']} - Probability: {pred['probability']:.2f}</p>"
+            finally:
+                os.remove(file_path)
+        else:
+            image_result_html = '<p>No image uploaded.</p>'
+
+        # Prediksi analisis sentimen
+        if text.strip() != '':
+            sentiment_prediction = predict_sentiment(text)
+            text_result_html = f'<h1>Sentiment Analysis Result</h1><p>Sentiment: {sentiment_prediction}</p>'
+        else:
+            text_result_html = '<p>No text for sentiment analysis</p>'
+
+         # Gabungkan hasil gambar dan teks
+        return image_result_html + text_result_html
+
+    except Exception as e:
+        logging.error(f"Error in prediction: {e}")
+        return '<p>Error in prediction.</p>', 500
+``` 
 
 ### 12. Menjalankan Aplikasi Flask
 ```python
