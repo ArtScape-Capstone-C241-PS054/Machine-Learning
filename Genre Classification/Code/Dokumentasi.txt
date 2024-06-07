@@ -37,7 +37,7 @@ Project ini bertujuan untuk melakukan klasifikasi genre seni pada gambar menggun
    - Menggunakan model yang telah dilatih untuk memuat dan memproses gambar-gambar tersebut.
 
 Catatan Penting:
-- Notebook ini menggunakan transfer learning dengan model Xception yang telah dilatih pada dataset ImageNet untuk melakukan klasifikasi gambar.
+- Project ini menggunakan transfer learning dengan model Xception yang telah dilatih pada dataset ImageNet untuk melakukan klasifikasi gambar.
 - Proses pelatihan model dilakukan dengan menggunakan ImageDataGenerator untuk memuat dan memproses gambar secara dinamis dalam bentuk batch.
 - Model yang telah dilatih kemudian dievaluasi dan disimpan untuk digunakan dalam prediksi kelas gambar yang baru.
 - Pengguna juga dapat mengunggah gambar-gambar baru di notebook ini untuk mendapatkan prediksi kelas dari model yang telah dilatih sebelumnya.
