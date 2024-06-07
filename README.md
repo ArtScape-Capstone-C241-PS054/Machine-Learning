@@ -295,12 +295,12 @@ This README provides an overview of the sentiment analysis project and explains 
 
 # 2. Artwork Genre Classification
 
-```markdown
+markdown
 # Artwork Genre Classification
 
 This repository contains code for classifying artwork images into different genres using TensorFlow. The project involves detailed steps for data pipelining, data splitting, model building, training, evaluation, model saving, and prediction.
 
-# **DATA PIPELINING**
+# DATA PIPELINING
 
 ## Extract
 
@@ -389,6 +389,7 @@ extension_counts_df.reset_index(inplace=True)
 # Menampilkan tabel
 print(extension_counts_df)
 
+```
 
 ## Data Splitting
 
