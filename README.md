@@ -392,42 +392,6 @@ for class_name in class_names:
 print("Pemisahan dataset selesai.")
 ```
 ```
-
-## Data Splitting
-
-The data splitting process involves splitting the dataset into training and validation sets.
-
-- **Creating Train and Validation Directories**: New directories are created to store training and validation images.
-- **Splitting Images**: Images are split into training and validation sets using `train_test_split`.
-- **Copying Images**: Images are copied to the respective directories based on the split.
-
-```python
-# Splitting dataset into train and validation sets
-train_dir = os.path.join(base_dir, 'train')
-os.makedirs(train_dir, exist_ok=True)
-validation_dir = os.path.join(base_dir, 'validation')
-os.makedirs(validation_dir, exist_ok=True)
-
-# Splitting images and copying to train and validation directories
-for class_name in class_names:
-    class_original_dir = os.path.join(original_dataset_dir, class_name)
-    class_train_dir = os.path.join(train_dir, class_name)
-    os.makedirs(class_train_dir, exist_ok=True)
-    class_validation_dir = os.path.join(validation_dir, class_name)
-    os.makedirs(class_validation_dir, exist_ok=True)
-
-    image_paths = [os.path.join(class_original_dir, image_name) for image_name in os.listdir(class_original_dir)]
-    train_image_paths, validation_image_paths = train_test_split(image_paths, test_size=0.2, random_state=42)
-
-    for image_path in train_image_paths:
-        image_name = os.path.basename(image_path)
-        target_path = os.path.join(class_train_dir, image_name)
-        copyfile(image_path, target_path)
-
-    for image_path in validation_image_paths:
-        image_name = os.path.basename(image_path)
-        target_path = os.path.join(class_validation_dir, image_name)
-        copyfile(image_path, target_path)
 ```
 
 ## Model Building
