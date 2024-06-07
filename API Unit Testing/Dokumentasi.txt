@@ -1,6 +1,6 @@
-                                                                    ==================================================
-                                                                                Dokumentasi API Unit Test
-                                                                    ==================================================
+==================================================
+Dokumentasi API Unit Test
+==================================================
 
 API Unit Test ini menyediakan endpoint-endpoint untuk menguji model analisis sentimen teks dan klasifikasi gambar. Berikut adalah deskripsi lengkap masing-masing endpoint beserta langkah-langkah penggunaannya:
 
@@ -40,4 +40,5 @@ Catatan Penting:
 - Pastikan file gambar yang diunggah memiliki format yang didukung untuk memastikan hasil klasifikasi yang akurat.
 - API Unit Test ini hanya untuk tujuan pengujian dan evaluasi model. Untuk penggunaan produksi, gunakan endpoint yang sesuai dengan aplikasi utama.
 
-                                                                                    
+==================================================
+                        
