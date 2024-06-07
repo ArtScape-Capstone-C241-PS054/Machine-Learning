@@ -1,5 +1,3 @@
-Tentu, mari kita jelaskan lebih detail masing-masing bagian kode berserta implementasinya:
-
 ### 1. Mengimpor Pustaka dan Modul
 ```python
 from flask import Flask, request
