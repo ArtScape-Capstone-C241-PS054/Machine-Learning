@@ -292,3 +292,262 @@ print(f'Hasil Prediksi: {preprocess_and_predict(input_text)}')
 ```
 
 This README provides an overview of the sentiment analysis project and explains how to use the provided code to perform sentiment analysis on Instagram comments.
+
+# 2. Artwork Genre Classification
+
+markdown
+# Artwork Genre Classification
+
+This repository contains code for classifying artwork images into different genres using TensorFlow. The project involves detailed steps for data pipelining, data splitting, model building, training, evaluation, model saving, and prediction.
+
+# DATA PIPELINING
+
+## Extract
+
+```python
+# Mengunduh dataset dari GitHub dengan git clone
+# !git clone https://github.com/zidan2808/NEW-ART-DATASETS.git
+
+# Mengatur path ke folder dataset
+dataset_dir = 'NEW ART DATASETS/ARTSCAPE'
+
+# Buat direktori baru untuk menyimpan gambar yang telah diproses
+preprocessed_dir = 'preprocessed_art'
+if not os.path.exists(preprocessed_dir):
+    os.makedirs(preprocessed_dir)
+
+# Fungsi untuk mendapatkan daftar kelas dan jumlah masing-masing kelas
+def get_class_distribution(dataset_dir):
+    class_counts = Counter()
+
+    # Loop melalui subdirektori dalam dataset_dir
+    for root, dirs, files in os.walk(dataset_dir):
+        for dir_name in dirs:
+            class_dir = os.path.join(root, dir_name)
+            num_images = len([f for f in os.listdir(class_dir)
+                             if os.path.isfile(os.path.join(class_dir, f))])
+            # Nama kelas diambil dari nama subdirektori terakhir
+            class_name = os.path.basename(class_dir)
+            class_counts[class_name] += num_images
+
+    return class_counts
+
+
+# Mendapatkan jumlah masing-masing kelas
+class_counts = get_class_distribution(dataset_dir)
+
+# Menghitung total jumlah kelas dan total jumlah file
+num_classes = len(class_counts)
+total_file_count = sum(class_counts.values())
+
+# Membuat DataFrame dari hasil penghitungan
+class_counts_df = pd.DataFrame.from_dict(
+    class_counts, orient='index', columns=['Jumlah'])
+class_counts_df.index.name = 'Genre'
+class_counts_df.reset_index(inplace=True)
+
+# Menampilkan tabel
+print(class_counts_df)
+
+# Menampilkan total jumlah kelas dan total jumlah file
+print(f"\nTotal Jenis Genre Seni: {num_classes}")
+print(f"Total Jumlah FIle: {total_file_count}")
+
+# Fungsi untuk mendapatkan daftar kelas dan jumlah masing-masing kelas
+def get_class_distribution(dataset_dir):
+    class_counts = Counter()
+    extension_counts = Counter()
+
+    # Loop melalui subdirektori dalam dataset_dir
+    for root, dirs, files in os.walk(dataset_dir):
+        for dir_name in dirs:
+            class_dir = os.path.join(root, dir_name)
+            num_images = len([f for f in os.listdir(class_dir)
+                             if os.path.isfile(os.path.join(class_dir, f))])
+            # Nama kelas diambil dari nama subdirektori terakhir
+            class_name = os.path.basename(class_dir)
+            class_counts[class_name] += num_images
+
+            # Menghitung jumlah file berdasarkan ekstensi
+            for file in os.listdir(class_dir):
+                if os.path.isfile(os.path.join(class_dir, file)):
+                    file_extension = os.path.splitext(file)[1].lower()
+                    extension_counts[file_extension] += 1
+
+    return class_counts, extension_counts
+
+
+# Mendapatkan jumlah masing-masing kelas dan ekstensi file
+class_counts, extension_counts = get_class_distribution(dataset_dir)
+
+# Membuat DataFrame dari hasil penghitungan ekstensi
+extension_counts_df = pd.DataFrame.from_dict(
+    extension_counts, orient='index', columns=['Jumlah'])
+extension_counts_df.index.name = 'Ekstensi'
+extension_counts_df.reset_index(inplace=True)
+
+# Menampilkan tabel
+print(extension_counts_df)
+
+```
+
+## Data Splitting
+
+The dataset is split into training and validation sets.
+
+```python
+# Splitting data into training and validation sets
+train_dir = os.path.join(base_dir, 'train')
+os.makedirs(train_dir, exist_ok=True)
+validation_dir = os.path.join(base_dir, 'validation')
+os.makedirs(validation_dir, exist_ok=True)
+
+# Splitting path gambar menjadi bagian training dan validasi
+for class_name in class_names:
+    # Path ke direktori kelas di dataset asli
+    class_original_dir = os.path.join(original_dataset_dir, class_name)
+
+    # Path ke direktori kelas di dataset baru untuk training dan validasi
+    class_train_dir = os.path.join(train_dir, class_name)
+    os.makedirs(class_train_dir, exist_ok=True)
+    class_validation_dir = os.path.join(validation_dir, class_name)
+    os.makedirs(class_validation_dir, exist_ok=True)
+
+    # Splitting path gambar menjadi bagian training dan validasi
+    image_paths = [os.path.join(class_original_dir, image_name)
+                   for image_name in os.listdir(class_original_dir)]
+    train_image_paths, validation_image_paths = train_test_split(
+        image_paths, test_size=0.2, random_state=42)
+
+    # Menyalin gambar ke direktori training
+    for image_path in train_image_paths:
+        image_name = os.path.basename(image_path)
+        target_path = os.path.join(class_train_dir, image_name)
+        copyfile(image_path, target_path)
+
+    # Menyalin gambar ke direktori validation
+    for image_path in validation_image_paths:
+        image_name = os.path.basename(image_path)
+        target_path = os.path.join(class_validation_dir, image_name)
+        copyfile(image_path, target_path)
+
+print("Pemisahan dataset selesai.")
+```
+
+## Model Building
+
+The model building process involves building a deep learning model using transfer learning (Xception).
+
+### Loading Base Model
+
+Xception base model is loaded.
+
+```python
+# Loading Xception base model
+base_model = tf.keras.applications.Xception(include_top=False, weights='imagenet', input_shape=(299, 299, 3), pooling='avg')
+```
+
+### Freezing Base Model Layers
+
+Base model layers are frozen to prevent retraining.
+
+```python
+# Freezing base model layers
+for layer in base_model.layers:
+    layer.trainable = False
+```
+
+### Adding Custom Layers
+
+Custom dense layers are added on top of the base model.
+
+```python
+# Adding custom layers
+model = Sequential()
+model.add(base_model)
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(256, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(num_classes, activation='softmax'))
+```
+
+### Compiling Model
+
+Model is compiled with optimizer, loss function, and metrics.
+
+```python
+# Compiling model
+model.compile(optimizer=RMSprop(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
+```
+
+## Model Training
+
+The model training process involves training the model on the training dataset.
+
+### Defining Callbacks
+
+ModelCheckpoint callback is defined to save the best model during training.
+
+```python
+# Defining ModelCheckpoint callback
+checkpoint = ModelCheckpoint('best_model.h5', monitor='val_accuracy', verbose=1, save_best_only=True, mode='max', save_weights_only=False, save_freq='epoch')
+```
+
+### Training Model
+
+Model is trained using the `fit` function.
+
+```python
+# Training model with checkpoint callback
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=EPOCHS, callbacks=[checkpoint], verbose=1)
+```
+
+## Model Evaluation
+
+The model evaluation process involves evaluating the model on the validation dataset.
+
+### Evaluating Model
+
+Model is evaluated using the `evaluate` function.
+
+```python
+# Evaluating model
+score = model.evaluate(validation_dataset, verbose=0)
+```
+
+### Calculating Metrics
+
+Accuracy and loss are calculated and printed.
+
+```python
+# Printing accuracy and loss
+print("Accuracy: {}%, Loss:{}".format(score[1]*100, score[0]))
+```
+
+## Model Saving
+
+The model saving process involves saving the trained model for future use.
+
+### Saving Model
+
+Trained model is saved to a .h5 file using the `save` function.
+
+```python
+# Saving the model to a .h5 file
+model.save('genre_classification_84.h5')
+```
+
+## Prediction
+
+The prediction process involves predicting genres for new artwork images.
+
+### Loading Model
+
+Trained model is loaded from the saved .h5 file.
+
+```python
+# Loading the saved model
+loaded_model = load_model('genre_classification_84.h5')

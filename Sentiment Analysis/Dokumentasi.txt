@@ -1,0 +1,39 @@
+==================================================
+         Dokumentasi Sentiment_Analisis
+==================================================
+
+Project ini bertujuan untuk melakukan analisis sentimen teks menggunakan teknik pemrosesan teks dan pembelajaran mesin. Dokumentasi ini akan memberikan penjelasan terperinci tentang setiap langkah dan komponen yang ada dalam notebook tersebut.
+
+1. Preprocessing:
+   - Langkah ini terdiri dari beberapa tahapan untuk membersihkan dan menormalkan teks:
+     a. Case Folding: Mengubah semua huruf menjadi huruf kecil.
+     b. Word Normalization: Mengubah kata-kata menjadi bentuk standar menggunakan kamus yang telah dinormalisasi sebelumnya.
+     c. Filtering (Stopword Removal): Menghapus kata-kata stopwords dari teks.
+     d. Steaming: Mengubah kata-kata menjadi bentuk dasarnya (stemming) menggunakan algoritma Sastrawi.
+
+2. Feature Engineering:
+   - Proses ini melibatkan:
+     a. Feature Extraction (TF-IDF and N-Gram): Mengubah teks menjadi representasi matriks TF-IDF, yang memperhitungkan frekuensi kata-kata dalam teks dan kemunculannya di seluruh dokumen.
+     b. Feature Selection (Chi Square): Memilih fitur-fitur terbaik menggunakan metode Chi-Square, yang mengukur hubungan antara fitur dan label sentimen.
+
+3. Building Model:
+   - Model jaringan saraf dibangun menggunakan TensorFlow:
+     a. Sequential Model: Berisi tiga lapisan Dense dengan dropout untuk menghindari overfitting.
+     b. Compile Model: Menggunakan optimizer 'adam' dan fungsi loss 'binary_crossentropy'.
+
+4. Evaluasi Model:
+   - Setelah melatih model, dilakukan evaluasi kinerja menggunakan data uji:
+     a. Metrik Evaluasi: Meliputi akurasi, precision, recall, dan f1-score.
+     b. Confusion Matrix: Menampilkan distribusi prediksi model terhadap kelas-kelas yang sebenarnya.
+     c. Classification Report: Menampilkan precision, recall, dan f1-score untuk setiap kelas.
+
+5. Finalizing:
+   - Model yang telah dilatih disimpan dalam format H5 untuk digunakan dalam aplikasi produksi.
+   - Model juga dikonversi menjadi format TensorFlow Lite (TFLite) untuk digunakan dalam aplikasi berbasis mobile.
+
+Catatan Penting:
+- Proses preprocessing dan feature engineering merupakan langkah penting untuk mendapatkan hasil yang baik dari model analisis sentimen.
+- Evaluasi kinerja model yang baik memberikan keyakinan dalam penggunaannya untuk aplikasi produksi.
+- Model yang disimpan dapat digunakan dalam aplikasi berbasis web atau mobile untuk melakukan analisis sentimen teks secara real-time.
+
+==================================================

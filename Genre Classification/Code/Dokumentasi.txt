@@ -1,0 +1,45 @@
+=================================================================
+             Dokumentasi Genre Classification
+=================================================================
+
+Project ini bertujuan untuk melakukan klasifikasi genre seni pada gambar menggunakan transfer learning dengan model Xception yang telah dilatih sebelumnya. Dokumentasi ini akan menjelaskan setiap langkah dan komponen yang ada dalam notebook tersebut.
+
+1. Import Library Penting:
+   - Notebook dimulai dengan mengimpor berbagai library yang diperlukan untuk menjalankan kode, termasuk TensorFlow, NumPy, Pandas, dan Matplotlib.
+
+2. Set Hyperparameter:
+   - Menentukan parameter seperti BATCH_SIZE, IMG_HEIGHT, IMG_WIDTH, dan EPOCHS yang akan digunakan dalam proses pelatihan model.
+
+3. Data Pipelining:
+   - Ekstraksi: Mengunduh dataset dari GitHub dan menghitung jumlah file dan kelas di dalamnya.
+   - Transformasi: Memproses gambar dalam dataset untuk diubah ukurannya dan disimpan dalam format PNG.
+   - Pemisahan Data: Memisahkan dataset menjadi bagian pelatihan dan validasi, dan menyalin gambar ke direktori baru sesuai dengan pembagian tersebut.
+
+4. Image Data Generator:
+   - Menggunakan ImageDataGenerator untuk memuat data gambar dari direktori, melakukan augmentasi data, dan menghasilkan batch data yang akan digunakan dalam pelatihan model.
+
+5. Load Pre-trained Xception Model:
+   - Memuat model Xception yang telah dilatih sebelumnya dari TensorFlow Hub, menambahkan lapisan klasifikasi kustom di atasnya, dan mengompilasi model untuk pelatihan.
+
+6. Pelatihan Model:
+   - Melatih model menggunakan data pelatihan dan validasi yang telah dipersiapkan sebelumnya.
+   - Menggunakan ModelCheckpoint callback untuk menyimpan model terbaik selama pelatihan.
+
+7. Evaluasi Model:
+   - Mengevaluasi kinerja model menggunakan data validasi, termasuk akurasi, loss, dan matriks kebingungan.
+   - Menampilkan grafik untuk memantau akurasi dan loss selama pelatihan.
+
+8. Simpan Model:
+   - Menyimpan model terlatih dalam format .h5 untuk digunakan kembali di masa mendatang.
+
+9. Prediksi Gambar:
+   - Memprediksi label kelas untuk gambar-gambar tertentu yang diberikan.
+   - Menggunakan model yang telah dilatih untuk memuat dan memproses gambar-gambar tersebut.
+
+Catatan Penting:
+- Project ini menggunakan transfer learning dengan model Xception yang telah dilatih pada dataset ImageNet untuk melakukan klasifikasi gambar.
+- Proses pelatihan model dilakukan dengan menggunakan ImageDataGenerator untuk memuat dan memproses gambar secara dinamis dalam bentuk batch.
+- Model yang telah dilatih kemudian dievaluasi dan disimpan untuk digunakan dalam prediksi kelas gambar yang baru.
+- Pengguna juga dapat mengunggah gambar-gambar baru di notebook ini untuk mendapatkan prediksi kelas dari model yang telah dilatih sebelumnya.
+
+=================================================================
