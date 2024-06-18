@@ -289,10 +289,5 @@ This setup ensures that any issues encountered during the execution of the API a
 
  logged for debugging purposes.
 
-## License
-
-Include a license if applicable.
-
----
 
 By following the setup instructions and utilizing the provided endpoints, users can interact with the image genre classification, text sentiment analysis, and art recommendation APIs to get predictions and recommendations based on their inputs.
