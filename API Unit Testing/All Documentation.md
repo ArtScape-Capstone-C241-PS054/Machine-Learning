@@ -23,14 +23,7 @@ This repository contains three Flask APIs: an image genre classification API, a 
 
 ## Setup Instructions
 
-1. **Clone the Repository:**
-
-    ```sh
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
-
-2. **Install the Required Packages:**
+1. **Install the Required Packages:**
 
     Make sure you have Python and pip installed. Then, install the required Python packages:
 
@@ -38,13 +31,13 @@ This repository contains three Flask APIs: an image genre classification API, a 
     pip install Flask tensorflow pandas scikit-learn nltk Sastrawi joblib
     ```
 
-3. **Download NLTK Stopwords:**
+2. **Download NLTK Stopwords:**
 
     ```sh
     python -m nltk.downloader stopwords
     ```
 
-4. **Place Model and Data Files:**
+3. **Place Model and Data Files:**
 
     - **Image Genre Classification:** Place `genre_classification_84.h5` in the specified directory.
     - **Text Sentiment Analysis:** Place `sentiment_analysis_model.h5`, `tf_idf_vectorizer.pkl`, `chi2_features.pkl`, and `key_norm.csv` in the specified directory.
@@ -52,7 +45,7 @@ This repository contains three Flask APIs: an image genre classification API, a 
 
     Update the paths in the code if necessary.
 
-5. **Run the Applications:**
+4. **Run the Applications:**
 
     For each API, navigate to its directory and run the Flask application:
 
