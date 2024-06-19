@@ -1,110 +1,122 @@
 from flask import Flask, request, jsonify
-import pandas as pd
-import re
-import tensorflow as tf
 from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import numpy as np
+import os
+import tempfile
+import re
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
 from nltk.corpus import stopwords
-from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import joblib
 import logging
+from sklearn.preprocessing import LabelEncoder
 
-# Initialize Flask app
+# Inisialisasi aplikasi Flask
 app = Flask(__name__)
 
-# Configure logging
+# Konfigurasi logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Load model and other necessary objects
+# Memuat model analisis sentimen dan objek
 try:
-    model = load_model(r'C:\Users\user\Documents\Capstone Analisis Sentimen\code\sentiment_analysis_model.h5')
+    sentiment_model = load_model(r'C:\Users\user\Documents\Capstone Analisis Sentimen\code\sentiment_analysis_model.h5')
     tf_idf = joblib.load(r'C:\Users\user\Documents\Capstone Analisis Sentimen\code\tf_idf_vectorizer.pkl')
     chi2_features = joblib.load(r'C:\Users\user\Documents\Capstone Analisis Sentimen\code\chi2_features.pkl')
     key_norm = pd.read_csv(r'C:\Users\user\Documents\Capstone Analisis Sentimen\Dataset\key_norm.csv')
-    logging.info("Model and objects loaded successfully.")
+    logging.info("Sentiment analysis model and objects loaded successfully.")
 except Exception as e:
-    logging.error(f"Error loading model or objects: {e}")
+    logging.error(f"Error loading sentiment analysis model or objects: {e}")
 
-# Define text preprocessing functions
-def casefolding(text):
+# Fungsi pra-pemrosesan teks untuk analisis sentimen
+def preprocess_text(text):
     text = text.lower()
-    text = re.sub(r'@[A-Za-z0-9_]+', '', text)
-    text = re.sub(r'#\w+', '', text)
-    text = re.sub(r'https?://\S+', '', text)
-    text = re.sub(r'<[^>]+>', '', text)
-    text = re.sub(r'[^A-Za-z\s]', '', text)
+    text = re.sub(r'@[A-Za-z0-9_]+', '', text) 
+    text = re.sub(r'#\w+', '', text) 
+    text = re.sub(r'https?://\S+', '', text)  
+    text = re.sub(r'<[^>]+>', '', text)  
+    text = re.sub(r'[^A-Za-z\s]', '', text)  
     return text
 
-def text_normalize(text):
+def normalize_text(text):
     words = text.split()
     normalized_words = []
     for word in words:
         match = key_norm[key_norm['singkat'] == word]
         normalized_words.append(match['hasil'].values[0] if not match.empty else word)
-    text = ' '.join(normalized_words)
-    return text.lower()
+    return ' '.join(normalized_words).lower()
 
 stopwords_ind = stopwords.words('indonesian')
-more_stopwords = ['tsel', 'gb', 'rb']
+more_stopwords = ['tsel', 'gb', 'rb']  
 stopwords_ind.extend(more_stopwords)
 
-def remove_stop_words(text):
+def remove_stopwords(text):
     return " ".join([word for word in text.split() if word not in stopwords_ind])
 
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 
-def stemming(text):
+def stem_text(text):
     return stemmer.stem(text)
 
-def text_preprocessing_process(text):
-    logging.debug(f"Original text: {text}")
-    text = casefolding(text)
-    logging.debug(f"After casefolding: {text}")
-    text = text_normalize(text)
-    logging.debug(f"After normalization: {text}")
-    text = remove_stop_words(text)
-    logging.debug(f"After removing stopwords: {text}")
-    text = stemming(text)
-    logging.debug(f"After stemming: {text}")
+def preprocess_text_pipeline(text):
+    text = preprocess_text(text)
+    text = normalize_text(text)
+    text = remove_stopwords(text)
+    text = stem_text(text)
     return text
 
-# Define prediction function
-def preprocess_and_predict(input_text):
+# Fungsi prediksi untuk analisis sentimen
+def predict_sentiment(input_text):
     try:
-        preprocessed_text = text_preprocessing_process(input_text)
-        logging.debug(f"Preprocessed text: {preprocessed_text}")
+        preprocessed_text = preprocess_text_pipeline(input_text)
         tf_idf_vec = tf_idf.transform([preprocessed_text]).toarray()
         kbest_vec = chi2_features.transform(tf_idf_vec)
-        prediction = (model.predict(kbest_vec) > 0.5).astype("int32")
-        logging.debug(f"Prediction result: {prediction}")
-        return 'komentar positive' if prediction == 1 else 'komentar negative'
+        prediction = (sentiment_model.predict(kbest_vec) > 0.5).astype("int32")
+        return 'positive' if prediction == 1 else 'negative'
     except Exception as e:
-        logging.error(f"Error in preprocessing or prediction: {e}")
+        logging.error(f"Error in sentiment analysis preprocessing or prediction: {e}")
         return 'error'
 
-# Define API endpoint
+# Rute untuk halaman utama dengan formulir unggah
 @app.route('/')
-def index():
-    return 'Welcome to the Sentiment Analysis API!'
+def home():
+    return '''
+    <h1>Sentiment Analysis</h1>
+    <form method="POST" action="/predict_recommend" enctype="multipart/form-data">
+        <h2>Input Text Please</h2>
+        <label for="text">Enter text for sentiment analysis:</label>
+        <input type="text" name="text" placeholder="Enter text for sentiment analysis"><br><br>
+        <input type="submit" value="Predict">
+    </form>
+    '''
 
-@app.route('/predict', methods=['POST'])
-def predict():
+# Rute untuk menangani prediksi genre, analisis sentimen, dan rekomendasi seni
+@app.route('/predict_recommend', methods=['POST'])
+def predict_recommend():
     try:
-        data = request.get_json(force=True)
-        input_text = data['text']
-        logging.info(f"Received text for prediction: {input_text}")
-        prediction = preprocess_and_predict(input_text)
-        return jsonify({'prediction': prediction})
-    except Exception as e:
-        logging.error(f"Error in /predict endpoint: {e}")
-        return jsonify({'error': 'An error occurred during prediction'}), 500
+        file = request.files.get('file')
+        text = request.form.get('text', '').strip()
 
-# Run the app
-if __name__ == '__main__':
-    try:
-        app.run(debug=True, port=5001, host='0.0.0.0')
+        image_result_html = ''
+        text_result_html = ''
+        recommendations_html = ''
+
+        # Prediksi analisis sentimen
+        if text:
+            sentiment_prediction = predict_sentiment(text)
+            text_result_html = f'<h1>Sentiment Analysis Result</h1><p>Sentiment: {sentiment_prediction}</p>'
+        else:
+            text_result_html = '<p>No text for sentiment analysis</p>'
+
+        # Gabungkan hasil gambar, teks, dan rekomendasi
+        return image_result_html + text_result_html + recommendations_html
+
     except Exception as e:
-        logging.error(f"Error starting the Flask app: {e}")
+        logging.error(f"Error in prediction or recommendation: {e}")
+        return '<p>Error in prediction or recommendation.</p>', 500
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5001, debug=False)
