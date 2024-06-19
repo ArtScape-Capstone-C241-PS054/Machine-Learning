@@ -15,14 +15,8 @@ This documentation provides an overview and detailed information about the Flask
 
 ## Setup Instructions
 
-1. **Clone the Repository:**
 
-    ```sh
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
-
-2. **Install the Required Packages:**
+1. **Install the Required Packages:**
 
     Make sure you have Python and pip installed. Then, install the required Python packages:
 
@@ -30,7 +24,7 @@ This documentation provides an overview and detailed information about the Flask
     pip install Flask tensorflow pandas scikit-learn
     ```
 
-3. **Model and Data Files:**
+2. **Model and Data Files:**
 
     Place your model file (`RecSys_CBF.h5`) and dataset file (`dataset_dummy.csv`) in the specified directory. Update the paths in the code if necessary:
 
@@ -39,7 +33,7 @@ This documentation provides an overview and detailed information about the Flask
     df = pd.read_csv(r'C:\Users\user\Documents\Capstone Analisis Sentimen\code\dataset_dummy.csv')
     ```
 
-4. **Run the Application:**
+3. **Run the Application:**
 
     Run the Flask application with:
 
